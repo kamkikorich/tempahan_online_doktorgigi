@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Klinik Pergigian Anda</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root { --primary: #004aad; --gold: #ffc107; --bg: #f5f5fc; }
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: #333; }
+    
+    .header { background: var(--primary); color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand img { width: 32px; height: 32px; border-radius: 50%; background: white; padding: 2px; }
+    .header h2 { margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; }
+    .btn-home { background: transparent; color: #bbdefb; border: 1px solid #bbdefb; font-size: 11px; padding: 6px 12px; border-radius: 50px; font-weight: bold; text-decoration: none; }
+    .btn-home:hover { background: #bbdefb; color: var(--primary); }
+
+    .controls { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    input[type="date"] { padding: 8px 15px; font-size: 15px; border: 1px solid #ccc; border-radius: 5px; outline: none; }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 15px 15px 50px; }
+    .card { background: white; padding: 12px; margin-bottom: 10px; border-radius: 8px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-left: 5px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .card.kosong { border-left-color: #4caf50; } 
+    .card.pending { border-left-color: #ff9800; background: #fff8e1; } 
+    .card.confirmed { border-left-color: #2196f3; } 
+
+    .info { flex: 1; min-width: 120px; }
+    .info b { display: block; font-size: 16px; color: var(--primary); }
+    .details { flex: 2; font-size: 13px; margin: 0 10px; min-width: 200px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; color: white; margin-bottom: 5px;}
+    .badge-pending { background: #ff9800; }
+    .badge-confirmed { background: #2196f3; }
+
+    .actions { min-width: 140px; text-align: right; display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap; }
+    .actions button { padding: 7px 9px; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; color: white; }
+    .btn-approve { background: #4caf50; }
+    .btn-reject { background: #f44336; }
+    .btn-block { background: #607d8b; }
+</style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="brand">
+            <img src="logo_klinikanda.png" alt="Logo">
+            <h2>ADMIN PANEL – KLINIK PERGIGIAN ANDA</h2>
+        </div>
+        <a href="index.html" class="btn-home"><i class="fas fa-home"></i> KE LAMAN TEMPAHAN</a>
+    </div>
+
+    <div class="controls">
+        <label style="font-size:13px;"><i class="far fa-calendar-alt"></i> Tarikh Jadual:</label>
+        <input type="date" id="adminDate" onchange="loadAdminData()">
+    </div>
+
+    <div class="container" id="adminList">
+        <p align="center">Memuatkan data...</p>
+    </div>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxw7jOX0MnBN2-KD6KT3lbt7liDItNs5rtLLci486Iy0hEDYcXjfE7WKOaYQJnWd1xz/exec"; 
+    
+    let adminToken = "";
+    checkAuth();
+
+    function checkAuth() {
+        let p = prompt("Masukkan Password Admin:");
+        if(p !== "Uni2025") { 
+            alert("Password salah.");
+            window.location.href = "index.html"; 
+        } else {
+            adminToken = p;
+            document.getElementById('adminDate').value = new Date().toISOString().split('T')[0];
+            loadAdminData();
+        }
+    }
+
+    async function loadAdminData() {
+        document.getElementById('adminList').innerHTML = '<p align="center">Mengemas kini data...</p>';
+        try {
+            let res = await fetch(API_URL + "?date=" + document.getElementById('adminDate').value);
+            let data = await res.json();
+            renderAdmin(data.jadual);
+        } catch(e) { 
+            alert("Ralat sambungan server.");
+        }
+    }
+
+    function renderAdmin(jadual) {
+        const list = document.getElementById('adminList');
+        list.innerHTML = "";
+        
+        jadual.forEach(item => {
+            let d = item.data;
+            let status = d.status || 'kosong'; 
+            
+            let cardClass = 'kosong';
+            let contentHTML = `<span style="color:green; font-style:italic;">-- Slot Kosong --</span>`;
+            let buttonsHTML = `<button class="btn-block" onclick="blockSlot('${item.masa}')">TUTUP SLOT</button>`;
+
+            if (status === 'PENDING') {
+                cardClass = 'pending';
+                contentHTML = `
+                    <span class="badge badge-pending">MENUNGGU PENGESAHAN</span><br>
+                    <b>${d.nama}</b> (${d.phone})<br>
+                    Masalah: ${d.masalah}
+                `;
+                buttonsHTML = `
+                    <button class="btn-approve" onclick="processSlot('${item.masa}', 'CONFIRMED', '${d.nama}', '${d.phone}', '${d.masalah}')">✅ SAHKAN & BALAS</button>
+                    <button class="btn-reject" onclick="processSlot('${item.masa}', 'DELETE', '${d.nama}', '${d.phone}')">❌ TOLAK</button>
+                `;
+            } else if (status === 'CONFIRMED') {
+                cardClass = 'confirmed';
+                contentHTML = `
+                    <span class="badge badge-confirmed">DISAHKAN</span><br>
+                    <b>${d.nama}</b> (${d.phone})<br>
+                    Masalah: ${d.masalah}
+                `;
+                buttonsHTML = `
+                    <button class="btn-reject" style="background:#444;" onclick="processSlot('${item.masa}', 'DELETE', '${d.nama}', '${d.phone}')">❌ BATALKAN</button>
+                `;
+            }
+
+            list.innerHTML += `
+            <div class="card ${cardClass}">
+                <div class="info"><b>${item.masa}</b><span>${item.service}</span></div>
+                <div class="details">${contentHTML}</div>
+                <div class="actions">${buttonsHTML}</div>
+            </div>`;
+        });
+    }
+
+    async function processSlot(time, action, nama, phone, masalah) {
+        if(!confirm(action === 'CONFIRMED' ? "Sahkan tempahan ini?" : "Tolak/Padam tempahan ini?")) return;
+
+        await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                type: "ADMIN_UPDATE",
+                password: adminToken,
+                date: document.getElementById('adminDate').value,
+                masa: time,
+                action: action
+            })
+        });
+
+        let dateStr = document.getElementById('adminDate').value;
+        let msg = "";
+        
+        if (action === 'CONFIRMED') {
+            msg = `Salam ${nama}, tempahan anda di Klinik Pergigian Anda telah *DISAHKAN*.\n\n` +
+                  `🗓 Tarikh: ${dateStr}\n` +
+                  `⏰ Masa: ${time}\n` +
+                  `🦷 Masalah: ${masalah}\n\n` +
+                  `Sila hadir 10 minit lebih awal. Terima kasih.`;
+        } else {
+            msg = `Salam ${nama}, dukacita dimaklumkan tempahan anda di Klinik Pergigian Anda pada ${dateStr} jam ${time} *TIDAK DAPAT DITERIMA* kerana slot tersebut telah penuh atau dibatalkan.\n\n` +
+                  `Sila pilih masa lain melalui sistem tempahan kami. Terima kasih.`;
+        }
+
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        loadAdminData();
+    }
+    
+    async function blockSlot(time) {
+        if(!confirm("Tutup slot ini daripada tempahan pelanggan?")) return;
+        await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                type: "BOOKING",
+                date: document.getElementById('adminDate').value,
+                masa: time,
+                nama: "SLOT DITUTUP",
+                phone: "-",
+                masalah: "Manual Close"
+            })
+        });
+        loadAdminData();
+    }
+</script>
+</body>
+</html>

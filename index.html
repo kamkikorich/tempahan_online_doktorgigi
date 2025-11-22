@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klinik Pergigian Anda</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root { --primary: #004aad; --dark-blue: #003366; --accent: #00c3ff; --bg: #f8f9fa; --text: #333; }
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    .hero { 
+        background: linear-gradient(135deg, var(--primary), var(--dark-blue)); 
+        color: white; 
+        padding: 40px 20px 50px; 
+        text-align: center; 
+        border-radius: 0 0 40px 40px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .logo-container { width: 110px; height: 110px; background: white; border-radius: 50%; padding: 5px; margin: 0 auto 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .logo-container img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+
+    .hero h1 { margin: 10px 0 5px; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+    .tagline { font-size: 14px; font-weight: 300; opacity: 0.95; font-style: italic; margin-top: 5px; color: #e3f2fd; }
+
+    .intro-card {
+        background: white;
+        max-width: 600px;
+        margin: -30px auto 20px;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        position: relative;
+        z-index: 5;
+        text-align: center;
+    }
+    .intro-text { font-size: 14px; color: #555; margin-bottom: 20px; }
+    
+    .features-list { list-style: none; padding: 0; text-align: left; margin: 0 auto 20px; display: inline-block; }
+    .features-list li { margin-bottom: 8px; font-size: 14px; color: var(--dark-blue); font-weight: 600; }
+    .features-list i { color: #25D366; margin-right: 10px; font-size: 16px; }
+
+    .cta-text { font-weight: 800; color: var(--primary); margin-bottom: 5px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .action-container { text-align: center; margin-bottom: 30px; }
+    .btn-main { 
+        background: linear-gradient(135deg, var(--primary), var(--dark-blue)); 
+        color: white; 
+        border: 3px solid white; 
+        padding: 16px 40px; 
+        font-size: 16px; 
+        font-weight: bold; 
+        border-radius: 50px; 
+        cursor: pointer; 
+        display: inline-block; 
+        box-shadow: 0 8px 25px rgba(0,74,173,0.4);
+        transition: transform 0.2s;
+        text-transform: uppercase;
+    }
+    .btn-main:active { transform: scale(0.95); }
+
+    .admin-btn-container { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; }
+    .btn-admin { background: #ff9800; color: white; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; font-size: 12px; display: inline-block; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3); transition: 0.3s; }
+    .btn-admin:hover { background: #f57c00; transform: translateY(-2px); }
+
+    #jadualWrapper { display: none; max-width: 600px; margin: 0 auto; padding: 0 15px 60px; animation: slideDown 0.5s ease; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .date-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px; border: 1px solid #eee; }
+    input[type="date"] { padding: 12px 20px; border: 2px solid #e0e0e0; border-radius: 50px; font-size: 16px; font-weight: bold; color: var(--primary); outline: none; width: 100%; max-width: 250px; text-align: center; }
+
+    .slot-card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; border-left: 5px solid var(--primary); }
+    .slot-info h4 { margin: 0; color: var(--primary); font-size: 16px; font-weight: 700; }
+    .slot-info p { margin: 5px 0 0; font-size: 13px; color: #666; font-weight: 600; }
+    
+    .btn-slot { padding: 12px 25px; border-radius: 50px; font-weight: bold; font-size: 11px; border: none; cursor: pointer; min-width: 110px; text-transform: uppercase; }
+    
+    .status-kosong { background: linear-gradient(135deg, #e0f2f1, #b2dfdb); color: #00695c; } 
+    .status-pending { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; cursor: not-allowed; } 
+    .status-penuh { background: #ffebee; color: #c62828; cursor: not-allowed; opacity: 0.7; } 
+
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(4px); }
+    .modal-box { background: white; width: 88%; max-width: 380px; padding: 30px 25px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    
+    .info-display { background: #f0f7ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; color: #0d47a1; border: 1px solid #d0e4ff; }
+    .form-group { margin-bottom: 15px; }
+    .form-input { width: 100%; padding: 14px; border: 2px solid #f0f0f0; border-radius: 10px; box-sizing: border-box; outline: none; font-size: 14px; background: #fafafa; }
+    .form-input:focus { border-color: var(--primary); background: white; }
+
+    .btn-submit { width: 100%; background: #25D366; color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-close { width: 100%; background: white; color: #666; padding: 12px; margin-top: 10px; border: 2px solid #eee; border-radius: 10px; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="logo-container">
+            <img src="logo_klinikanda.png" alt="Logo Klinik">
+        </div>
+        <h1>KLINIK PERGIGIAN ANDA</h1>
+        <p class="tagline">"Senyuman Sihat Bermula Di Klinik Pergigian Anda"</p>
+    </div>
+
+    <div class="intro-card">
+        <p class="intro-text">
+            Kami menyediakan rawatan pergigian moden dan selamat untuk semua peringkat umur. 
+            Pasukan doktor bertauliah kami komited memberikan pengalaman rawatan yang selesa, teliti dan profesional.
+        </p>
+
+        <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Tempahan Online Mudah & Cepat</li>
+            <li><i class="fas fa-check-circle"></i> Rawatan Mesra & Profesional</li>
+            <li><i class="fas fa-check-circle"></i> Untuk Kanak-Kanak, Dewasa & Warga Emas</li>
+            <li><i class="fas fa-check-circle"></i> Teknologi Pergigian Terkini</li>
+        </ul>
+
+        <div class="cta-text">Tempah Sekarang • Senyum Kemudian</div>
+        
+        <div class="action-container" style="margin-bottom:0;">
+            <button class="btn-main" onclick="toggleJadual()">
+                📅 LIHAT JADUAL & TEMPAH
+            </button>
+        </div>
+    </div>
+
+    <div id="jadualWrapper">
+        <div class="date-card">
+            <span style="font-size:12px; font-weight:bold; color:#888;">PILIH TARIKH RAWATAN:</span><br>
+            <input type="date" id="dateInput" onchange="loadData()">
+        </div>
+
+        <div id="slotList">
+            <p align="center" style="color:#888; margin-top:40px;"><i class="fas fa-spinner fa-spin"></i> Memuatkan jadual...</p>
+        </div>
+
+        <div class="admin-btn-container">
+            <a href="admin.html" class="btn-admin"><i class="fas fa-user-shield"></i> STAF LOGIN</a>
+        </div>
+    </div>
+
+    <div id="modalForm" class="modal">
+        <div class="modal-box">
+            <h3 style="margin:0 0 20px; color:var(--primary); text-align:center;">BUTIRAN TEMPAHAN</h3>
+            <div class="info-display">
+                📅 <b>Tarikh:</b> <span id="dDate">...</span><br>
+                ⏰ <b>Masa:</b> <span id="dTime">...</span><br>
+                🦷 <b>Rawatan:</b> <span id="dService">...</span>
+            </div>
+            <div class="form-group">
+                <input type="text" id="inpNama" class="form-input" placeholder="Nama Penuh Pesakit">
+            </div>
+            <div class="form-group">
+                <input type="tel" id="inpPhone" class="form-input" placeholder="No. Tel (Mula dengan 60, cth: 6012...)">
+            </div>
+            <div class="form-group">
+                <input type="text" id="inpMasalah" class="form-input" placeholder="Masalah (Contoh: Sakit Gigi / Cabut)">
+            </div>
+            <button class="btn-submit" onclick="submitBooking()"><i class="fab fa-whatsapp"></i> HANTAR TEMPAHAN</button>
+            <button class="btn-close" onclick="closeModal()">BATAL</button>
+        </div>
+    </div>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxw7jOX0MnBN2-KD6KT3lbt7liDItNs5rtLLci486Iy0hEDYcXjfE7WKOaYQJnWd1xz/exec"; 
+    const KLINIK_HP = "601112601715";
+    
+    let selectedSlot = {};
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateInput').value = today;
+    document.getElementById('dateInput').min = today;
+
+    function toggleJadual() {
+        var wrapper = document.getElementById('jadualWrapper');
+        wrapper.style.display = (wrapper.style.display === 'none' || wrapper.style.display === '') ? 'block' : 'none';
+        if(wrapper.style.display === 'block') { loadData(); wrapper.scrollIntoView({ behavior: 'smooth' }); }
+    }
+
+    async function loadData() {
+        const list = document.getElementById('slotList');
+        list.innerHTML = '<p align="center" style="color:#888; margin-top:40px;"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</p>';
+        try {
+            let res = await fetch(API_URL + "?date=" + document.getElementById('dateInput').value);
+            let data = await res.json();
+            renderList(data.jadual);
+        } catch(e) { list.innerHTML = "<p align='center'>Gagal sambung server.</p>"; }
+    }
+
+    function renderList(data) {
+        const list = document.getElementById('slotList');
+        list.innerHTML = "";
+        if(!data || data.length === 0) { list.innerHTML = "<p align='center' style='margin-top:30px;'>Tiada slot.</p>"; return; }
+
+        data.forEach(item => {
+            let d = item.data || {};
+            let statusDB = d.status || 'kosong'; 
+            
+            let btnClass = 'status-kosong';
+            let btnText = 'TEMPAH';
+            let action = `onclick="openModal('${item.service}', '${item.masa}')"`;
+
+            if (statusDB === 'PENDING') {
+                btnClass = 'status-pending'; btnText = 'DIPROSES'; action = ''; 
+            } else if (statusDB === 'CONFIRMED') {
+                btnClass = 'status-penuh'; btnText = 'PENUH'; action = ''; 
+            }
+
+            list.innerHTML += `
+            <div class="slot-card">
+                <div class="slot-info"><h4>${item.service}</h4><p><i class="far fa-clock"></i> ${item.masa}</p></div>
+                <button class="btn-slot ${btnClass}" ${action}>${btnText}</button>
+            </div>`;
+        });
+    }
+
+    function openModal(svc, time) {
+        selectedSlot = { svc, time };
+        document.getElementById('dService').innerText = svc;
+        document.getElementById('dTime').innerText = time;
+        document.getElementById('dDate').innerText = formatDate(document.getElementById('dateInput').value);
+        document.getElementById('inpNama').value = "";
+        document.getElementById('inpPhone').value = "";
+        document.getElementById('inpMasalah').value = "";
+        document.getElementById('modalForm').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modalForm').style.display = 'none'; }
+
+    async function submitBooking() {
+        let nama = document.getElementById('inpNama').value;
+        let rawPhone = document.getElementById('inpPhone').value;
+        let masalah = document.getElementById('inpMasalah').value;
+
+        if(!nama || !rawPhone || !masalah) { alert("Sila isi Nama, No Telefon dan Masalah."); return; }
+
+        let cleanPhone = rawPhone.replace(/\D/g, ''); 
+        if (cleanPhone.startsWith('0')) cleanPhone = '60' + cleanPhone.substring(1);
+        else if (!cleanPhone.startsWith('60')) cleanPhone = '60' + cleanPhone;
+
+        let btn = document.querySelector('.btn-submit');
+        let oldText = btn.innerHTML;
+        btn.innerHTML = "SEDANG HANTAR...";
+        btn.disabled = true;
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: "BOOKING",
+                    date: document.getElementById('dateInput').value,
+                    masa: selectedSlot.time,
+                    masalah: masalah,
+                    nama: nama,
+                    phone: cleanPhone
+                })
+            });
+
+            let msg = `Hai Klinik Pergigian Anda, saya nak tempah:\n\n` +
+                      `🗓 Tarikh: ${document.getElementById('dDate').innerText}\n` +
+                      `⏰ Masa: ${selectedSlot.time}\n` +
+                      `👤 Nama: ${nama}\n` +
+                      `📞 Tel: ${cleanPhone}\n` +
+                      `🦷 Masalah: ${masalah}`;
+            
+            window.open(`https://wa.me/${KLINIK_HP}?text=${encodeURIComponent(msg)}`, '_blank');
+            closeModal();
+            loadData(); 
+        } catch(e) { alert("Ralat sistem."); }
+        
+        btn.innerHTML = oldText;
+        btn.disabled = false;
+    }
+
+    function formatDate(str) {
+        let options = { day: 'numeric', month: 'long', year: 'numeric' };
+        return new Date(str).toLocaleDateString('ms-MY', options);
+    }
+</script>
+</body>
+</html>
